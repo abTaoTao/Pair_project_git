@@ -7,10 +7,11 @@
 #include <string>
 #include <regex>
 #include <unordered_map>
+#include<iostream>
+#include<fstream>
 #include "exception.h"
 
 #define EPS 1e-13
-
 using namespace std;
 
 enum LineType { type_line, type_ray, type_segment };
@@ -64,7 +65,12 @@ public:
 		y = _y;
 	}
 };
-
+/*struct equals {
+	bool operator()( const Point&a,  const Point&b) const
+	{
+		return fabs(a.getX() - b.getX()) < EPS && fabs(a.getY() - b.getY()) < EPS;
+	}
+};*/
 
 class HashPoint {
 public:
@@ -79,15 +85,11 @@ private:
 	LineType type;
 	Point p1;
 	Point p2;
-
 	Direction dir;
 	long long a;
 	long long b;
 	long long c;
-
-	double value;
 public:
-	static double xvalue;
 	Line(LineType _type, int x1, int y1, int x2, int y2) {
 		a = y2 - y1;
 		b = x1 - x2;
@@ -116,38 +118,37 @@ public:
 	}
 
 	bool isOnLine(Point p) {
-		double px = p.getX();
-		double py = p.getY();
-		if (a * px + b * py + c < EPS) {
-			if (type == type_line) {
-				return true;
+		if (type == type_line) {
+			return true;
+		}
+		else if (type == type_ray) {
+			if (dir == dir_left) {
+				return p < p2 || p == p2;
 			}
-			else if (type == type_ray) {
-				if (dir == dir_left) {
-					return p < p2 || p == p2;
-				}
-				if (dir == dir_right) {
-					return p1 < p || p1 == p;
-				}
+			if (dir == dir_right) {
+				return p1 < p || p1 == p;
 			}
-			else if (type == type_segment) {
-				return (p1 < p && p < p2) || (p1 == p) || (p2 == p);
-			}
+		}
+		else if (type == type_segment) {
+			return (p1 < p && p < p2) || (p1 == p) || (p2 == p);
 		}
 		return false;
 	}
 	vector<Point> getIntersect(Line l) {
 		vector<Point> points;
 		int r = relation(l);
+		//printf("%d\n", r);
 		if (r == 0) {
-			if (type == type_segment || l.type == type_segment) {
+			if (type == type_segment && l.type == type_segment) {
+				//printf("in getIntersect S1:%lf %lf %lf %lf\n", p1.getX(), p1.getY(), p2.getX(), p2.getY());
+				//printf("in getIntersect S2:%lf %lf %lf %lf\n", l.p1.getX(), l.p1.getY(), l.p2.getX(), l.p2.getY());
 				if (p1 == l.p2) {
 					points.push_back(p1);
 				}
 				else if (p2 == l.p1) {
 					points.push_back(p2);
 				}
-				else if (p1 < l.p2 || l.p1 < p2) {
+				else if (p1 < l.p2  && l.p2 < p2 || l.p1 < p2 && p2 < l.p2) {
 					throw CoincideException("线段之间存在重合！");
 				}
 			}
@@ -204,6 +205,7 @@ public:
 			double tmpy = (double)(l.a * c - a * l.c) / down;
 			Point tmpp(tmpx, tmpy);
 			if (isOnLine(tmpp) && l.isOnLine(tmpp)) {
+			//	printf("直线与直线交点:%lf %lf\n", tmpp.getX(), tmpp.getY());
 				points.push_back(tmpp);
 			}
 		}
@@ -215,27 +217,13 @@ public:
 	Direction getDirection() {
 		return dir;
 	}
-	double getValue() {
-		return value;
-	}
-	void setValue(double _value) {
-		value = _value;
-	}
-
-	bool operator<(const Line& l) {
-		//不比较斜率不存在的情况
-		double value1 = -(a * xvalue + c) / b;
-		double value2 = -(l.a * xvalue + l.c) / l.b;
-		return value1 < value2;
-	}
 };
 class PairCore{
-
 private:
 	string input;
 	string output;
 	vector<Line> lines;
-	priority_queue<Point, vector<Point>, less<Point>> pointQueue;
+	unordered_set<Point, HashPoint> points;
 public:
 	int parser(int argc, char* argv[]);
 	void text_handle() {
@@ -246,16 +234,19 @@ public:
 			getline(in_file, str);
 		}
 		regex num_pattern("[1-9][0-9]*");
-		regex line_pattern("(L|R|S) (-?[1-9][0-9]*) (-?[1-9][0-9]*) (-?[1-9][0-9]*) (-?[1-9][0-9]*)");
-		regex circle_pattern("(C) (-?[1-9][0-9]*) (-?[1-9][0-9]*) (-?[1-9][0-9]*)");
+		regex line_pattern("(L|R|S) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0)");
+		//cout << regex_match("L -1 -2 -3 2", line_pattern) << endl;
+		//cout << regex_match("L -1 -2 -3 0", line_pattern) << endl;
+		regex circle_pattern("(C) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0)");
 		if (regex_match(str, num_pattern)) {
 			while (in_file.good()) {
 				getline(in_file, str);
+				//cout << str << endl;
 				if (regex_match(str,line_pattern)) {
 					char type;
 					int x1, y1, x2, y2;
 					LineType _type;
-					sscanf(str.c_str(), "%c %d %d %d %d", &type, &x1, &y1, &x2, &y2);
+					sscanf_s(str.c_str(), "%c %d %d %d %d", &type, sizeof(char), &x1, &y1, &x2, &y2);
 					if (type == 'L')
 						_type = type_line;
 					else if (type == 'R')
@@ -263,13 +254,12 @@ public:
 					else
 						_type = type_segment;
 					if (x1 == x2 && y1 == y2) {
-						//
+						throw InputException("输入了两个重复的交点！");
 					}
 					else if (abs(x1) >= 100000 || abs(y1) >= 100000 || abs(x2) >= 100000 || abs(y2) >= 100000) {
-						//
+						throw InputException("坐标超出了范围，应该在(-100000,100000)！");
 					}
-					lines.emplace_back(_type ,x1, y1, x2, y2);
-					
+					lines.emplace_back(_type ,x1, y1, x2, y2);	
 				}
 				else if (regex_match(str, circle_pattern)) {
 
@@ -279,22 +269,43 @@ public:
 				}
 
 			}
+			//cout << lines.size() << endl;
 		}
 		else {
 			throw InputException("请先输入一个正整数");
 		}
 	}
-	void getIntersectionCount() {
-		int index, line_size = lines.size();
-		for (index = 0; index < line_size; ++index) {
-			if (lines[index].getLineType == type_line || lines[index].getLineType == type_ray && lines[index].getDirection() == dir_left) {
-				lineList.push_back(index);
+	void insert_line(LineType _type, int x1, int y1, int x2, int y2) {
+		lines.emplace_back(_type, x1, y1, x2, y2);
+	}
+	int getIntersectionCount() {
+		auto end = lines.end();
+		//int count = 0;
+		for (auto it1 = lines.begin(); it1 != end - 1; it1++) {
+			for (auto it2 = it1 + 1; it2 != end; it2++) {
+				//count++;
+				vector<Point> intersections = it1->getIntersect(*it2);
+				for (auto it3 : intersections) {
+					points.insert(it3);
+				}
 			}
 		}
-		for (auto it1 = lineList.begin(); it1 != lineList.end() - 1; it1++) {
-			for (auto it2 = it1 + 1; it2 != lineList.end(); it2++) {
-				
-			}
+		///printf("%d\n", count);
+		return points.size();
+	}
+	void output1() {
+		input = "input9.txt";
+		output = "output.txt";
+		try {
+			text_handle();
+			ofstream out_file;
+			out_file.open(output);
+			int count = getIntersectionCount();
+			cout << count;
+			out_file << count;
+		}
+		catch (exception e) {
+			cout << e.what();
 		}
 	}
 };

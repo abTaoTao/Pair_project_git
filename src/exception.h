@@ -7,6 +7,7 @@ class CoincideException : public exception
 public:
 	CoincideException(const char* str) :exception(str)
 	{
+
 	}
 };
 class InputException : public exception {

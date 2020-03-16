@@ -2,10 +2,7 @@
 #include <string>
 #include <fstream>
 
-string input = "";
-string output = "";
-
-int parser(int argc, char* argv[]) {
+int PairCore::parser(int argc, char* argv[]) {
 
 	if (argc == 3) {
 		string s1(argv[1]);
@@ -53,8 +50,10 @@ int parser(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-	if (parser(argc, argv)) {
+	PairCore pairCore;
+	if (pairCore.parser(argc, argv)) {
 		return 1;
 	}
-
+	pairCore.output1();
+	return 0;
 }
