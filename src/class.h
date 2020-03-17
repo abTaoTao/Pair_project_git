@@ -325,9 +325,9 @@ public:
 			getline(in_file, str);
 		}
 		//处理换行?如果某一行是直接输入一个换行，导致改行是空串，是否继续读？
-		while (str == "" && in_file.good()) {
+		/*while (str == "" && in_file.good()) {
 			getline(in_file, str);
-		}
+		}*/
 		regex num_pattern("[1-9][0-9]*");
 		regex line_pattern("(L|R|S) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0)");
 		//cout << regex_match("L -1 -2 -3 2", line_pattern) << endl;
@@ -370,10 +370,10 @@ public:
 					}
 					circles.emplace_back(x0, y0, r0);
 				}
-				//处理换行?如果某一行是直接输入一个换行，导致改行是空串，是否继续读？
+				/*//处理换行?如果某一行是直接输入一个换行，导致改行是空串，是否继续读？
 				else if (str == "") {
 					continue;
-				}
+				}*/
 				else {
 					throw InputException("图形的类型出错！");
 				}
@@ -418,8 +418,8 @@ public:
 		return points.size();
 	}
 	void output1() {
-		input = "input2.txt";
-		output = "output.txt";
+		//input = "input2.txt";
+		//output = "output.txt";
 		try {
 			text_handle();
 			ofstream out_file;
