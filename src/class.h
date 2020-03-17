@@ -318,6 +318,7 @@ private:
 public:
 	int parser(int argc, char* argv[]);
 	void text_handle() {
+		int geo_num = 0;
 		ifstream in_file;
 		in_file.open(input);
 		string str;
@@ -334,6 +335,7 @@ public:
 		//cout << regex_match("R 2 5 -1 2", line_pattern) << endl;
 		regex circle_pattern("(C) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0) ((-?[1-9][0-9]*)|0)");
 		if (regex_match(str, num_pattern)) {
+			sscanf_s(str.c_str(), "%d", &geo_num);
 			while (in_file.good()) {
 				getline(in_file, str);
 				//cout << str << endl;
@@ -381,6 +383,9 @@ public:
 		}
 		else {
 			throw InputException("请先输入一个正整数!");
+		}
+		if ((lines.size() + circles.size()) != geo_num) {
+			throw InputException("请输入相应个数的几何图形！");
 		}
 	}
 	void insert_line(LineType _type, int x1, int y1, int x2, int y2) {
