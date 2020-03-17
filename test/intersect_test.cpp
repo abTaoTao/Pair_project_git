@@ -83,5 +83,156 @@ namespace UnitTestPair
 			paircore->insert_line(type_ray, 1, -3, 9, 21);
 			Assert::AreEqual(paircore->getIntersectionCount(), 1);
 		}
+
+		//test for circle
+		TEST_METHOD(TestMethod10)
+		{
+			PairCore* paircore = new PairCore();
+			//圆与线段所在直线有交点但是不在线段上
+			paircore->insert_circle(1,2,3);
+			paircore->insert_line(type_segment, 1,2, 1, 0);
+			Assert::AreEqual(paircore->getIntersectionCount(), 0);
+		}
+		TEST_METHOD(TestMethod111)
+		{
+			PairCore* paircore = new PairCore();
+			//圆与线段所在直线有交点但是其中一个交点不在线段上
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_segment, 1, 2, 1, -3);
+			Assert::AreEqual(paircore->getIntersectionCount(), 1);
+		}
+		TEST_METHOD(TestMethod11)
+		{
+			PairCore* paircore = new PairCore();
+			//圆与线段所在直线有交点且都在线段端点上
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_segment, 1, -1, 1, 5);
+			Assert::AreEqual(paircore->getIntersectionCount(), 2);
+		}
+		TEST_METHOD(TestMethod12)
+		{
+			PairCore* paircore = new PairCore();
+			//圆与线段所在直线有交点且都在线段上
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_segment, 1, -7, 1, 9);
+			Assert::AreEqual(paircore->getIntersectionCount(), 2);
+		}
+		TEST_METHOD(TestMethod13)
+		{
+			PairCore* paircore = new PairCore();
+			//线段与圆相切，但是切点不在线段上
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_segment, -1, 5, 0, 5);
+			Assert::AreEqual(paircore->getIntersectionCount(), 0);
+		}
+		TEST_METHOD(TestMethod14)
+		{
+			PairCore* paircore = new PairCore();
+			//线段与圆相切，切点在线段端点上
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_segment, -1, 5, 1, 5);
+			Assert::AreEqual(paircore->getIntersectionCount(), 1);
+		}
+		TEST_METHOD(TestMethod15)
+		{
+			PairCore* paircore = new PairCore();
+			//线段与圆相切，切点在线段上
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_segment, -1, 5, 2, 5);
+			Assert::AreEqual(paircore->getIntersectionCount(), 1);
+		}
+		TEST_METHOD(TestMethod155)
+		{
+			PairCore* paircore = new PairCore();
+			//线段与圆相离
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_segment, -1, 5, 2, 18);
+			Assert::AreEqual(paircore->getIntersectionCount(), 0);
+		}
+		TEST_METHOD(TestMethod16)
+		{
+			PairCore* paircore = new PairCore();
+			//射线所在直线与圆相交，交点不在射线上
+			paircore->insert_circle(1, 2, 2);
+			paircore->insert_line(type_ray, 0, 0, -1, -2);
+			Assert::AreEqual(paircore->getIntersectionCount(), 0);
+		}
+		TEST_METHOD(TestMethod17)
+		{
+			PairCore* paircore = new PairCore();
+			//射线所在直线与圆相交，只有一个交点在射线(端点)上，另一个不在射线上
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_ray, 1,-1, -1, -9);
+			Assert::AreEqual(paircore->getIntersectionCount(), 1);
+		}
+		TEST_METHOD(TestMethod18)
+		{
+			PairCore* paircore = new PairCore();
+			//射线所在直线与圆相交，只有一个交点在射线(端点)上，另一个在射线上
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_line(type_ray, 1, -1, -1, 1);
+			Assert::AreEqual(paircore->getIntersectionCount(), 2);
+		}
+		TEST_METHOD(TestMethod19)
+		{
+			PairCore* paircore = new PairCore();
+			//圆相交
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_circle(1, 4, 2);
+			Assert::AreEqual(paircore->getIntersectionCount(), 2);
+		}
+		TEST_METHOD(TestMethod20)
+		{
+			PairCore* paircore = new PairCore();
+			//圆相切-外切
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_circle(1, 6, 1);
+			Assert::AreEqual(paircore->getIntersectionCount(), 1);
+		}
+		TEST_METHOD(TestMethod21)
+		{
+			PairCore* paircore = new PairCore();
+			//圆相切-内切
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_circle(1, 4, 1);
+			Assert::AreEqual(paircore->getIntersectionCount(), 1);
+		}
+		TEST_METHOD(TestMethod22)
+		{
+			PairCore* paircore = new PairCore();
+			//圆相离
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_circle(2, 99, 2);
+			Assert::AreEqual(paircore->getIntersectionCount(), 0);
+		}
+		TEST_METHOD(TestMethod23)
+		{
+			PairCore* paircore = new PairCore();
+			//圆内含
+			paircore->insert_circle(1, 2, 3);
+			paircore->insert_circle(1, 2, 9);
+			Assert::AreEqual(paircore->getIntersectionCount(), 0);
+		}
+
+		TEST_METHOD(TestMethod24)
+		{
+			PairCore* paircore = new PairCore();
+			//综合测试-样例
+			paircore->insert_circle(3, 3, 3);
+			paircore->insert_line(type_segment, 2, 4, 3, 2);
+			paircore->insert_line(type_line, -1, 4, 5, 2);
+			paircore->insert_line(type_ray, 2, 5, -1, 2);
+			Assert::AreEqual(paircore->getIntersectionCount(), 5);
+		}
+		TEST_METHOD(TestMethod25)
+		{
+			PairCore* paircore = new PairCore();
+			//综合测试-边界测试
+			paircore->insert_circle(99998, 99998, 1);
+			paircore->insert_line(type_segment, 99999,99999,99999,99998);//1
+			paircore->insert_line(type_line, -99999,99999,-99998,99999);//2
+			paircore->insert_line(type_ray, 99999,99999,99998,99998);//3(1个点重复)
+			Assert::AreEqual(paircore->getIntersectionCount(), 5);
+		}
 	};
 }
