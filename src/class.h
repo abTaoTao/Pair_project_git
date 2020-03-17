@@ -11,7 +11,7 @@
 #include<fstream>
 #include "exception.h"
 
-#define EPS 1e-13
+#define EPS 1e-10
 using namespace std;
 
 enum LineType { type_line, type_ray, type_segment };
@@ -208,7 +208,7 @@ public:
 			double tmpy = (double)(l.a * c - a * l.c) / down;
 			Point tmpp(tmpx, tmpy);
 			if (isOnLine(tmpp) && l.isOnLine(tmpp)) {
-			//	printf("直线与直线交点:%lf %lf\n", tmpp.getX(), tmpp.getY());
+				//printf("直线与直线交点:%lf %lf\n", tmpp.getX(), tmpp.getY());
 				points.push_back(tmpp);
 			}
 		}
@@ -242,10 +242,10 @@ public:
 		r0 = _r0;
 	}
 	double getDistance(Line line) {
-		double A = line.getA();
-		double B = line.getB();
-		double C = line.getC();
-		double dis = double(A * x0 + B * y0 + C) / sqrt(A * A + B * B);
+		long long A = line.getA();
+		long long B = line.getB();
+		long long C = line.getC();
+		double dis = (A * x0 + B * y0 + C) / sqrt(A * A + B * B);
 		return fabs(dis);
 	}
 	vector<Point> getIntersectWithLine(Line line) {
@@ -264,13 +264,13 @@ public:
 		double Y = points[0].getY();
 		//求交点
 		//printf("int getLineInter:%lf %lf\n", dis, (double)r0);
-		if (dis < (double)r0) {
+		if (fabs(dis - double(r0)) >= EPS && dis < double(r0)) {
 			//printf("圆与直线的距离小于半径！");
-			double times = sqrt((double)r0 * r0 - dis * dis);
+			double times = sqrt(r0 * r0 - dis * dis);
 			Point point1, point2;
 			//求直线的单位向量方向上长度为：sqrt(半径平方-dis平方)的向量
-			double first = times * B / sqrt((double)A * A + B * B);
-			double second = -times * A / sqrt((double)A * A + B * B);
+			double first = times * B / sqrt(A * A + B * B);
+			double second = -times * A / sqrt(A * A + B * B);
 			point1.setXY(X - first, Y - second);
 			point2.setXY(X + first, Y + second);
 			if (line.isOnLine(point1))
@@ -423,7 +423,7 @@ public:
 		return points.size();
 	}
 	void output1() {
-		//input = "input2.txt";
+		//input = "input8.txt";
 		//output = "output.txt";
 		try {
 			text_handle();
