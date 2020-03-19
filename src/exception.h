@@ -16,3 +16,9 @@ public:
 
 	}
 };
+class CommandException : public exception {
+public:
+	CommandException(const char* str) : exception(str) {
+
+	}
+};

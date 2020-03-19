@@ -50,10 +50,9 @@ int PairCore::parser(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-	PairCore pairCore;
-	if (pairCore.parser(argc, argv)) {
-		return 1;
+	PairCore *pairCore = new PairCore(COMMAND);
+	if (pairCore->parser(argc, argv)) {
+		return -13;
 	}
-	pairCore.output1();
-	return 0;
+	return pairCore->output1();
 }

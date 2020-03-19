@@ -9,9 +9,14 @@
 #include <unordered_map>
 #include<iostream>
 #include<fstream>
+#include <map>
 #include "exception.h"
 
 #define EPS 1e-10
+#define GUI 1
+#define COMMAND 2
+#define TEST 3
+#define TEST_INPUT_ERROR 4
 using namespace std;
 
 enum LineType { type_line, type_ray, type_segment };
@@ -315,7 +320,30 @@ private:
 	vector<Line> lines;
 	vector<Circle> circles;
 	unordered_set<Point, HashPoint> points;
+	map<string, int> exc2;
+	int mode = 1;
+	
 public:
+	PairCore(int _mode) {
+		if (_mode == GUI) {
+			input = "lines.pair";
+			output = "points.pair";
+		}
+		mode = _mode;
+		exc2.insert(pair<string, int>("线段之间存在重合！", -1));
+		exc2.insert(pair<string, int>("线段和射线之间存在重合！", -2));
+		exc2.insert(pair<string, int>("射线之间存在重合！", -3));
+		exc2.insert(pair<string, int>("直线与某条线重合！", -4));
+		exc2.insert(pair<string, int>("圆与圆重合！", -5));
+		exc2.insert(pair<string, int>("输入了两个重复的交点！", -6));
+		exc2.insert(pair<string, int>("坐标超出了范围，应该在(-100000,100000)！", -7));
+		exc2.insert(pair<string, int>("请保证输入的圆的半径是大于0的整数", -8));
+		exc2.insert(pair<string, int>("图形的类型出错！", -9));
+		exc2.insert(pair<string, int>("请先输入一个正整数！", -10));
+		exc2.insert(pair<string, int>("请输入相应个数的几何图形！", -11));
+		exc2.insert(pair<string, int>("多余的换行符！", -12));
+		exc2.insert(pair<string, int>("命令行参数错误！", -13));
+	}
 	int parser(int argc, char* argv[]);
 	void text_handle() {
 		int geo_num = 0;
@@ -372,21 +400,26 @@ public:
 					}
 					circles.emplace_back(x0, y0, r0);
 				}
-				/*//处理换行?如果某一行是直接输入一个换行，导致改行是空串，是否继续读？
+				//处理换行?如果某一行是直接输入一个换行，导致改行是空串，是否继续读？
 				else if (str == "") {
-					continue;
-				}*/
+					if (in_file.good()) {
+						throw InputException("多余的换行符！");
+					}
+				}
 				else {
 					throw InputException("图形的类型出错！");
 				}
 			}
 		}
 		else {
-			throw InputException("请先输入一个正整数!");
+			throw InputException("请先输入一个正整数！");
 		}
 		if ((lines.size() + circles.size()) != geo_num) {
 			throw InputException("请输入相应个数的几何图形！");
 		}
+	}
+	void setInput(string _input) {
+		input = _input;
 	}
 	void insert_line(LineType _type, int x1, int y1, int x2, int y2) {
 		lines.emplace_back(_type, x1, y1, x2, y2);
@@ -407,7 +440,9 @@ public:
 			}
 			for (j = i + 1; j < line_size; j++) {
 				vector<Point> intersections = lines[i].getIntersect(lines[j]);
+
 				for (auto point : intersections) {
+				//	printf("%.22lf %.22lf\n", point.getX(), point.getY());
 					points.insert(point);
 				}
 			}
@@ -422,19 +457,44 @@ public:
 		}
 		return points.size();
 	}
-	void output1() {
-		//input = "input8.txt";
-		//output = "output.txt";
-		try {
-			text_handle();
-			ofstream out_file;
-			out_file.open(output);
-			int count = getIntersectionCount();
-			cout << count;
-			out_file << count;
+	int output1() {
+		//input = "D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\error7.txt";
+	   // output = "output.txt";
+		if (mode == TEST) {
+			try {
+				int count = getIntersectionCount();
+				return count;
+			}
+			catch (exception e) {
+				return exc2[e.what()];
+			}
 		}
-		catch (exception e) {
-			cout << e.what();
+		else if (mode == TEST_INPUT_ERROR) {
+			try {
+				text_handle();
+				int count = getIntersectionCount();
+				return count;
+			}
+			catch (exception e) {
+				return exc2[e.what()];
+			}
+		}
+		else {
+			try {
+				text_handle();
+				ofstream out_file;
+				out_file.open(output);
+				int count = getIntersectionCount();
+				//cout << count;
+				out_file << count;
+				return count;
+			}
+			catch (exception e) {
+				cout << e.what()<<endl;
+				cout << exc2[e.what()];
+				return exc2[e.what()];
+
+			}
 		}
 	}
 };
