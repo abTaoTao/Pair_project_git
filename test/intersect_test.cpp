@@ -234,6 +234,19 @@ namespace UnitTestPair
 			paircore->insert_line(type_ray, 99999,99999,99998,99998);//3(1个点重复)
 			Assert::AreEqual(paircore->getIntersectionCount(), 5);
 		}
-
+		//test interface gui
+		/*
+		TEST_METHOD(TestMethod27_GUI)
+		{
+			//PairCore* paircore = new PairCore(GUI);
+			//Assert::AreEqual(paircore->output1() ,6);
+			Assert::AreEqual(gui_solve(), 6);
+		}
+		//test interface command
+		TEST_METHOD(TestMethod28_Command)
+		{
+			Assert::AreEqual(command_solve(), 6);
+		}
+		*/
 	};
 }

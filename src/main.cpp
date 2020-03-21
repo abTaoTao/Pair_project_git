@@ -48,6 +48,32 @@ int PairCore::parser(int argc, char* argv[]) {
 	}
 	return 0;
 }
+int gui_solve() {
+	PairCore* paircore = new PairCore(GUI);
+	return paircore->output1();
+}
+int command_solve() {
+	char* argv[128];
+	PairCore* paircore = new PairCore(COMMAND);
+	ifstream input_command;
+	input_command.open("command.pair");
+	int argc = 0;
+	string str;
+	try {
+		while (input_command.good()) {
+			getline(input_command, str);
+			argv[argc] = (char*)malloc(128 * sizeof(char));
+			strcpy_s(argv[argc++], 128, str.c_str());
+		}
+		paircore->parser(argc, argv);
+		int answer = 0;
+		answer = paircore->output1();
+		return answer;
+	}
+	catch (exception e) {
+		return paircore->getError(e.what());
+	}
+}
 
 int main(int argc, char* argv[]) {
 	PairCore *pairCore = new PairCore(COMMAND);
@@ -55,4 +81,6 @@ int main(int argc, char* argv[]) {
 		return -13;
 	}
 	return pairCore->output1();
+	//cout<<gui_solve();
+	//cout<<command_solve();
 }

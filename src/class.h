@@ -71,7 +71,6 @@ public:
 	}
 };
 
-
 class HashPoint {
 public:
 	size_t operator()(const Point& pr) const
@@ -458,8 +457,8 @@ public:
 		return points.size();
 	}
 	int output1() {
-		//input = "D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\error7.txt";
-	   // output = "output.txt";
+		//input = "D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\error8.txt";
+	   //output = "output.txt";
 		if (mode == TEST) {
 			try {
 				int count = getIntersectionCount();
@@ -490,11 +489,20 @@ public:
 				return count;
 			}
 			catch (exception e) {
-				cout << e.what()<<endl;
-				cout << exc2[e.what()];
+				//cout << e.what()<<endl;
+				//cout << exc2[e.what()];
 				return exc2[e.what()];
 
 			}
 		}
 	}
+	int getError(string str) {
+		return exc2[str];
+	}
 };
+
+// for GUI
+int gui_solve();
+
+//for command
+int command_solve();
