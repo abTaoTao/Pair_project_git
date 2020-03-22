@@ -166,7 +166,7 @@ public:
 					//points.push_back(p2);
 					points.setXY(p2.getX(), p2.getY());
 				}
-				else if (p1 < l.p2 && l.p2 < p2 || l.p1 < p2 && p2 < l.p2) {
+				else if (l.p1 < p2 && p1 < l.p2) {
 					throw CoincideException("线段之间存在重合！");
 				}
 				else {
@@ -494,7 +494,7 @@ public:
 		return points.size();
 	}
 	int output1() {
-		//input = "D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\input.txt";
+	  //input = "D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\lines.pair";
 	  // output = "output.txt";
 		if (mode == TEST) {
 			try {
