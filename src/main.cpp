@@ -3,7 +3,6 @@
 #include <fstream>
 
 int PairCore::parser(int argc, char* argv[]) {
-
 	if (argc == 3) {
 		string s1(argv[1]);
 		if (s1 == "-i") {
@@ -63,7 +62,8 @@ int command_solve() {
 		while (input_command.good()) {
 			getline(input_command, str);
 			argv[argc] = (char*)malloc(128 * sizeof(char));
-			strcpy_s(argv[argc++], 128, str.c_str());
+			memcpy_s(argv[argc++],128, str.c_str(), 128);
+		//	memcpy_s()
 		}
 		paircore->parser(argc, argv);
 		int answer = 0;
@@ -82,5 +82,6 @@ int main(int argc, char* argv[]) {
 	}
 	return pairCore->output1();
 	//cout<<gui_solve();
+
 	//cout<<command_solve();
 }

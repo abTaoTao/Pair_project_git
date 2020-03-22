@@ -19,23 +19,28 @@
 #define TEST_INPUT_ERROR 4
 using namespace std;
 
-enum LineType { type_line, type_ray, type_segment };
-enum Direction { dir_left, dir_right };
+enum class LineType { type_line, type_ray, type_segment };
+enum class Direction { dir_left, dir_right };
 
 class Point {
 private:
 	double x;
 	double y;
+	int error_flag;
 public:
 	Point() {
 		x = 0;
 		y = 0;
+		error_flag = 0;
 	}
 	Point(double _x, double _y) {
 		x = _x;
 		y = _y;
+		error_flag = 0;
 	}
-
+	void SetError() {
+		error_flag = 1;
+	}
 	bool operator==(const Point& p) const {
 		return (fabs(x - p.x) < EPS && fabs(y - p.y) < EPS);
 	}
@@ -69,13 +74,16 @@ public:
 		x = _x;
 		y = _y;
 	}
+	int getErrorFlag() {
+		return error_flag;
+	}
 };
 
 class HashPoint {
 public:
 	size_t operator()(const Point& pr) const
 	{
-		return hash<float>()(pr.getX()) ^ hash<float>()(pr.getY());
+		return hash<float>()((float)pr.getX()) ^ hash<float>()((float)pr.getY());
 	}
 };
 
@@ -98,12 +106,12 @@ public:
 		if (tmp1 < tmp2) {
 			p1.setXY(x1, y1);
 			p2.setXY(x2, y2);
-			dir = dir_right;
+			dir = Direction::dir_right;
 		}
 		else {
 			p2.setXY(x1, y1);
 			p1.setXY(x2, y2);
-			dir = dir_left;
+			dir = Direction::dir_left;
 		}
 		type = _type;
 	}
@@ -113,7 +121,7 @@ public:
 		a = _a;
 		b = _b;
 		c = _c;
-		dir = dir_right;
+		dir = Direction::dir_right;
 	}
 	//0所在直线重合，1平行但是不重合，2相交
 	int relation(Line l) {
@@ -125,77 +133,101 @@ public:
 			return 2;
 	}
 	bool isOnLine(Point p) {
-		if (type == type_line) {
+		if (type == LineType::type_line) {
 			return true;
 		}
-		else if (type == type_ray) {
-			if (dir == dir_left) {
+		else if (type == LineType::type_ray) {
+			if (dir == Direction::dir_left) {
 				return p < p2 || p == p2;
 			}
-			if (dir == dir_right) {
+			if (dir == Direction::dir_right) {
 				return p1 < p || p1 == p;
 			}
 		}
-		else if (type == type_segment) {
+		else if (type == LineType::type_segment) {
 			return (p1 < p && p < p2) || (p1 == p) || (p2 == p);
 		}
 		return false;
 	}
-	vector<Point> getIntersect(Line l) {
-		vector<Point> points;
+	Point getIntersect(Line l) {
+		Point points;
 		int r = relation(l);
 		//printf("%d\n", r);
 		if (r == 0) {
-			if (type == type_segment && l.type == type_segment) {
+			if (type == LineType::type_segment && l.type == LineType::type_segment) {
 				//printf("in getIntersect S1:%lf %lf %lf %lf\n", p1.getX(), p1.getY(), p2.getX(), p2.getY());
 				//printf("in getIntersect S2:%lf %lf %lf %lf\n", l.p1.getX(), l.p1.getY(), l.p2.getX(), l.p2.getY());
 				if (p1 == l.p2) {
-					points.push_back(p1);
+					//points.push_back(p1);
+					points.setXY(p1.getX(), p1.getY());
+
 				}
 				else if (p2 == l.p1) {
-					points.push_back(p2);
+					//points.push_back(p2);
+					points.setXY(p2.getX(), p2.getY());
 				}
-				else if (p1 < l.p2  && l.p2 < p2 || l.p1 < p2 && p2 < l.p2) {
+				else if (p1 < l.p2 && l.p2 < p2 || l.p1 < p2 && p2 < l.p2) {
 					throw CoincideException("线段之间存在重合！");
 				}
+				else {
+					points.SetError();
+				}
 			}
-			else if (type == type_segment && l.type == type_ray) {
-				if ((l.dir == dir_left && p1 < l.p2) || (l.dir == dir_right && l.p1 < p2)) {
+			else if (type == LineType::type_segment && l.type == LineType::type_ray) {
+				if ((l.dir == Direction::dir_left && p1 < l.p2) || (l.dir == Direction::dir_right && l.p1 < p2)) {
 					throw CoincideException("线段和射线之间存在重合！");
 				}
-				else if (l.dir == dir_left && p1 == l.p2) {
-					points.push_back(p1);
+				else if (l.dir == Direction::dir_left && p1 == l.p2) {
+					//points.push_back(p1);
+					points.setXY(p1.getX(), p1.getY());
 				}
-				else if (l.dir == dir_right && l.p1 == p2) {
-					points.push_back(p2);
+				else if (l.dir == Direction::dir_right && l.p1 == p2) {
+					//points.push_back(p2);
+					points.setXY(p2.getX(), p2.getY());
+				}
+				else {
+					points.SetError();
 				}
 			}
-			else if (type == type_ray && l.type == type_segment) {
-				if ((dir == dir_left && l.p1 < p2) || (dir == dir_right && p1 < l.p2)) {
+			else if (type == LineType::type_ray && l.type == LineType::type_segment) {
+				if ((dir == Direction::dir_left && l.p1 < p2) || (dir == Direction::dir_right && p1 < l.p2)) {
 					throw CoincideException("线段和射线之间存在重合！");
 				}
-				else if (dir == dir_left && l.p1 == p2) {
-					points.push_back(p2);
+				else if (dir == Direction::dir_left && l.p1 == p2) {
+					//points.push_back(p2);
+					points.setXY(p2.getX(), p2.getY());
 				}
-				else if (dir == dir_right && p1 == l.p2) {
-					points.push_back(p1);
+				else if (dir == Direction::dir_right && p1 == l.p2) {
+					//points.push_back(p1);
+					points.setXY(p1.getX(), p1.getY());
+				}
+				else {
+					points.SetError();
 				}
 			}
-			else if (type == type_ray && l.type == type_ray) {
-				if (dir == dir_left && l.dir == dir_right) {
+			else if (type == LineType::type_ray && l.type == LineType::type_ray) {
+				if (dir == Direction::dir_left && l.dir == Direction::dir_right) {
 					if (l.p1 < p2) {
 						throw CoincideException("射线之间存在重合！");
 					}
 					else if (l.p1 == p2) {
-						points.push_back(p2);
+						//points.push_back(p2);
+						points.setXY(p2.getX(), p2.getY());
+					}
+					else {
+						points.SetError();
 					}
 				}
-				else if (dir == dir_right && l.dir == dir_left) {
+				else if (dir == Direction::dir_right && l.dir == Direction::dir_left) {
 					if (p1 < l.p2) {
 						throw CoincideException("射线之间存在重合！");
 					}
 					else if (p1 == l.p2) {
-						points.push_back(p1);
+						//points.push_back(p1);
+						points.setXY(p1.getX(), p1.getY());
+					}
+					else {
+						points.SetError();
 					}
 				}
 				else {
@@ -207,14 +239,21 @@ public:
 			}
 		}
 		else if (r == 2) {
-			double down = (a * l.b - l.a * b);
+			double down = ((double)a * l.b - (double)l.a * b);
 			double tmpx = (double)(b * l.c - l.b * c) / down;
 			double tmpy = (double)(l.a * c - a * l.c) / down;
 			Point tmpp(tmpx, tmpy);
 			if (isOnLine(tmpp) && l.isOnLine(tmpp)) {
 				//printf("直线与直线交点:%lf %lf\n", tmpp.getX(), tmpp.getY());
-				points.push_back(tmpp);
+				points.setXY(tmpp.getX(), tmpp.getY());
 			}
+			else {
+				points.SetError();
+			}
+		}
+		else {
+			//没有交点
+			points.SetError();
 		}
 		return points;
 	}
@@ -259,13 +298,13 @@ public:
 		long long C = line.getC();
 		double dis = getDistance(line);
 		//line 的垂线line_v
-		Line *line_v = new Line(type_line, B, -A, A * y0 - B * x0);
+		Line* line_v = new Line(LineType::type_line, B, -A, A * y0 - B * x0);
 		//传入的线可能是线段或者射线，将之转化为直线求解。
-		Line* line_copy = new Line(type_line, A, B, C);
-		//直线与垂线的交点
-		vector<Point> points = line_v->getIntersect(*line_copy);
-		double X = points[0].getX();
-		double Y = points[0].getY();
+		Line* line_copy = new Line(LineType::type_line, A, B, C);
+		//直线与垂线的交点,必定有交点
+		Point points = line_v->getIntersect(*line_copy);
+		double X = points.getX();
+		double Y = points.getY();
 		//求交点
 		//printf("int getLineInter:%lf %lf\n", dis, (double)r0);
 		if (fabs(dis - double(r0)) >= EPS && dis < double(r0)) {
@@ -283,9 +322,9 @@ public:
 				intersectsWithLine.push_back(point2);
 			//printf("%.22lf %.22lf %.22lf %.22lf\n", point1.getX(), point1.getY(), point2.getX(), point2.getY());
 		}
-		else if (fabs (dis - double(r0)) < EPS) {
-			if(line.isOnLine(points[0]))
-				intersectsWithLine.push_back(points[0]);
+		else if (fabs(dis - double(r0)) < EPS) {
+			if (line.isOnLine(points))
+				intersectsWithLine.push_back(points);
 		}
 		else {
 			return intersectsWithLine;
@@ -307,12 +346,12 @@ public:
 			if (d <= 0 || d > (double)r1 + r0 || d < abs((double)r0 - r1)) {
 				return intersectsWithCirc;
 			};
-			Line* line1 = new Line(type_line, 2 * x1 - 2 * x0, 2 * y1 - 2 * y0, -x1 * x1 + x0 * x0 - y1 * y1 + y0 * y0 + r1 * r1 - r0 * r0);
+			Line* line1 = new Line(LineType::type_line, 2 * x1 - 2 * x0, 2 * y1 - 2 * y0, -x1 * x1 + x0 * x0 - y1 * y1 + y0 * y0 + r1 * r1 - r0 * r0);
 			return getIntersectWithLine(*line1);
 		}
 	}
 };
-class PairCore{
+class PairCore {
 private:
 	string input;
 	string output;
@@ -321,7 +360,7 @@ private:
 	unordered_set<Point, HashPoint> points;
 	map<string, int> exc2;
 	int mode = 1;
-	
+
 public:
 	PairCore(int _mode) {
 		if (_mode == GUI) {
@@ -366,25 +405,25 @@ public:
 			while (in_file.good()) {
 				getline(in_file, str);
 				//cout << str << endl;
-				if (regex_match(str,line_pattern)) {
+				if (regex_match(str, line_pattern)) {
 					//cout << str << endl;
 					char type;
 					int x1, y1, x2, y2;
 					LineType _type;
 					sscanf_s(str.c_str(), "%c %d %d %d %d", &type, sizeof(char), &x1, &y1, &x2, &y2);
 					if (type == 'L')
-						_type = type_line;
+						_type = LineType::type_line;
 					else if (type == 'R')
-						_type = type_ray;
+						_type = LineType::type_ray;
 					else
-						_type = type_segment;
+						_type = LineType::type_segment;
 					if (x1 == x2 && y1 == y2) {
 						throw InputException("输入了两个重复的交点！");
 					}
 					else if (abs(x1) >= 100000 || abs(y1) >= 100000 || abs(x2) >= 100000 || abs(y2) >= 100000) {
 						throw InputException("坐标超出了范围，应该在(-100000,100000)！");
 					}
-					lines.emplace_back(_type ,x1, y1, x2, y2);	
+					lines.emplace_back(_type, x1, y1, x2, y2);
 				}
 				else if (regex_match(str, circle_pattern)) {
 					//cout << str << endl;
@@ -429,21 +468,19 @@ public:
 	int getIntersectionCount() {
 		int line_size = lines.size();
 		int circ_size = circles.size();
+		vector<Point> intersections;
 		int i, j;
 		for (i = 0; i < line_size; ++i) {
 			for (j = 0; j < circ_size; ++j) {
-				vector<Point> intersections = circles[j].getIntersectWithLine(lines[i]);
+				intersections = circles[j].getIntersectWithLine(lines[i]);
 				for (auto point : intersections) {
 					points.insert(point);
 				}
 			}
 			for (j = i + 1; j < line_size; j++) {
-				vector<Point> intersections = lines[i].getIntersect(lines[j]);
-
-				for (auto point : intersections) {
-				//	printf("%.22lf %.22lf\n", point.getX(), point.getY());
+				Point point = lines[i].getIntersect(lines[j]);
+				if (!point.getErrorFlag())
 					points.insert(point);
-				}
 			}
 		}
 		for (i = 0; i < circ_size; ++i) {
@@ -457,8 +494,8 @@ public:
 		return points.size();
 	}
 	int output1() {
-		//input = "D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\error8.txt";
-	   //output = "output.txt";
+		//input = "D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\input.txt";
+	  // output = "output.txt";
 		if (mode == TEST) {
 			try {
 				int count = getIntersectionCount();

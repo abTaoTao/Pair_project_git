@@ -2,7 +2,9 @@
 #include "CppUnitTest.h"
 #include "../intersect/class.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
+#define type_segment LineType::type_segment
+#define type_ray  LineType::type_ray
+#define type_line LineType::type_line
 namespace UnitTestPair
 {
 	TEST_CLASS(UnitTestPair)

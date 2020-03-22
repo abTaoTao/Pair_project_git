@@ -2,7 +2,9 @@
 #include "CppUnitTest.h"
 #include "../intersect/class.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
+#define type_segment LineType::type_segment
+#define type_ray  LineType::type_ray
+#define type_line LineType::type_line
 namespace UnitTestPair
 {
 	TEST_CLASS(UnitTestPair)
@@ -82,7 +84,7 @@ namespace UnitTestPair
 		TEST_METHOD(TestMethodE10)
 		{
 			PairCore* paircore = new PairCore(TEST_INPUT_ERROR);
-			//坐标超出范围
+			//请保证输入的圆的半径是大于0的整数
 			paircore->setInput("D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\error8.txt");
 			Assert::AreEqual(paircore->output1(), -8);
 		}
@@ -96,21 +98,21 @@ namespace UnitTestPair
 		TEST_METHOD(TestMethodE12)
 		{
 			PairCore* paircore = new PairCore(TEST_INPUT_ERROR);
-			//图形类型不正确
+			//请先输入一个正整数
 			paircore->setInput("D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\error10.txt");
 			Assert::AreEqual(paircore->output1(), -10);
 		}
 		TEST_METHOD(TestMethodE13)
 		{
 			PairCore* paircore = new PairCore(TEST_INPUT_ERROR);
-			//图形类型不正确
+			//请输入相应个数的几何图形
 			paircore->setInput("D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\error11.txt");
 			Assert::AreEqual(paircore->output1(), -11);
 		}
 		TEST_METHOD(TestMethodE14)
 		{
 			PairCore* paircore = new PairCore(TEST_INPUT_ERROR);
-			//图形类型不正确
+			//多余的换行符
 			paircore->setInput("D:\\学习资料\\大三下\\软工\\结队项目\\intersect\\error12.txt");
 			Assert::AreEqual(paircore->output1(), -12);
 		}
