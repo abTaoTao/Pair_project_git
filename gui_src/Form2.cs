@@ -31,7 +31,7 @@ namespace PairUI
 
         private void Panel1_Paint(object sender, PaintEventArgs e)
         {
-            string[] points = File.ReadAllLines("points.pair");
+            string[] points = File.ReadAllLines("points.txt");
             string[] lines = File.ReadAllLines("lines.pair");
             List<Geo> geos = new List<Geo>();
             foreach (string elm in points)

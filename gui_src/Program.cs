@@ -10,7 +10,7 @@ namespace PairUI
 {
     static class Program
     {
-        [DllImport("dll_Test.dll", EntryPoint = "command", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Dll1.dll", EntryPoint = "run2", CallingConvention = CallingConvention.Cdecl)]
         unsafe public static extern int Command();
 
         [DllImport("kernel32.dll")]
@@ -25,25 +25,26 @@ namespace PairUI
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            File.WriteAllText("command.pair", "intersect.exe");
             if (args.Length > 0)
             {
-                File.WriteAllText("command.pair", "intersect.exe");
                 foreach (string elm in args)
                 {
-                    File.AppendAllText("command.pair", "\n" + elm);
+                    File.AppendAllText("command.pair", " " + elm);
                 }
                 int sb = Command();
                 if (sb < 0)
                 {
                     string str;
-                    switch(sb)
+                    switch (sb)
                     {
                         case -1:
-                            str = "线段之间存在重合！";
+                            str = "文件读入异常！";
                             break;
                         case -2:
-                            str = "线段和射线之间存在重合！";
+                            str = "存在重合！";
                             break;
+                        /*
                         case -3:
                             str = "射线之间存在重合！";
                             break;
@@ -77,6 +78,7 @@ namespace PairUI
                         case -13:
                             str = "命令行参数错误！";
                             break;
+                        */
                         default:
                             str = "未知错误！";
                             break;
@@ -85,6 +87,7 @@ namespace PairUI
                 }
             } else
             {
+                File.AppendAllText("command.pair", " -i lines.pair -o output.pair");
                 Application.Run(new Form1());
             }
         }

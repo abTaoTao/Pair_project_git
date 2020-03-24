@@ -16,7 +16,7 @@ namespace PairUI
 {
     public partial class Form1 : Form
     {
-        [DllImport("dll_Test.dll", EntryPoint = "solve", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Dll1.dll", EntryPoint = "run2", CallingConvention = CallingConvention.Cdecl)]
         public static extern int Solve();
         public static bool IsNum(string value)
         {
@@ -228,11 +228,12 @@ namespace PairUI
                     switch (sb)
                     {
                         case -1:
-                            str = "线段之间存在重合！";
+                            str = "文件读入异常！";
                             break;
                         case -2:
-                            str = "线段和射线之间存在重合！";
+                            str = "存在重合！";
                             break;
+                        /*
                         case -3:
                             str = "射线之间存在重合！";
                             break;
@@ -266,6 +267,7 @@ namespace PairUI
                         case -13:
                             str = "命令行参数错误！";
                             break;
+                        */
                         default:
                             str = "未知错误！";
                             break;
@@ -273,6 +275,7 @@ namespace PairUI
                     MessageBox.Show("求解时发生错误！\n" + str);
                 } else
                 {
+                    sb = Convert.ToInt32(File.ReadAllText("output.pair"));
                     MessageBox.Show("求解结束，得到" + sb.ToString() + "个交点。\n点击“确定”开始绘图。");
                     Form2 form2 = new Form2();
                     form2.ShowDialog();
