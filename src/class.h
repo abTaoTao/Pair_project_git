@@ -526,7 +526,7 @@ public:
 				return count;
 			}
 			catch (exception e) {
-				//cout << e.what()<<endl;
+				cout << e.what()<<endl;
 				//cout << exc2[e.what()];
 				return exc2[e.what()];
 

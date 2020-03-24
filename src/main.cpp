@@ -78,10 +78,8 @@ int command_solve() {
 int main(int argc, char* argv[]) {
 	PairCore *pairCore = new PairCore(COMMAND);
 	if (pairCore->parser(argc, argv)) {
+		cout << "ÃüÁîĞĞ²ÎÊı´íÎó£¡";
 		return -13;
 	}
 	return pairCore->output1();
-	//cout<<gui_solve();
-
-	//cout<<command_solve();
 }
